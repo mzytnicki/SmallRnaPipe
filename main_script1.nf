@@ -128,7 +128,6 @@ process cleaning_reads_with_low_complexity {
 
 	output:
 	tuple val(prefix), path("*good*.fastq") into read_clean_to_maps
-	tuple val(prefix), path("*good*.fastq") into lol
 	script:
 	"""
 	prinseq-lite -fastq $reads_trim -lc_method dust -lc_threshold 7
