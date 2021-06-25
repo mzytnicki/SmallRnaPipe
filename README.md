@@ -1,5 +1,8 @@
 # SmallRnaPipe
 
+## Why are we doing this pipeline ?
+
+This pipeline use some programms which aren't use by any other pipeline which analyses Small Rnas. These programms ([srnaMapper]( https://github.com/mzytnicki/srnaMapper) and [mmquant](https://bitbucket.org/mzytnicki/multi-mapping-counter/src/master/)) make that this pipeline is very useful for the reproductibily of the analyses of Small Rnas. 
 
 ## Arguments
 
