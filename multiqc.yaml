@@ -1,0 +1,14 @@
+show_analysis_paths: False
+show_analysis_time: False
+skip_generalstats: True
+
+run_modules:
+  - fastqc
+
+module_order:
+  - fastqc:
+      name: 'Raw reads quality'
+      target: 'FastQC'
+      info: 'results for each input fastq file.'
+      path_filters_exclude:
+        - "~/Documents/projet_nextflow/results/fastqc/* fastqc.zip"
