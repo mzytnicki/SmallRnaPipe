@@ -155,7 +155,6 @@ if (!index){
 	
 		script:
 		"""
-		echo $genome
 		bwa index -p $prefix $genome
 		"""
 
@@ -184,6 +183,7 @@ read_clean_to_maps.combine(index_to_maps_sr).set {
 	read_clean_to_maps
 }
 
+
 process mapping_with_srnamapper {
 
 
@@ -194,7 +194,7 @@ process mapping_with_srnamapper {
 
 
         output:
-        tuple val(prefix), path( "*.bam") into bam_map_to_mmquant
+        path ("*.bam") into bam_map_to_mmquant
 
 
         script:
@@ -205,24 +205,21 @@ process mapping_with_srnamapper {
 
 }
 
-bam_map_to_mmquant.combine(annotation_to_mmquant).set {
-        bam_map_to_mmquant
-}
-
 process mmquant {
 
 	publishDir "$baseDir/results/mmquant", mode: "copy"
 
 
 	input:
-	tuple val(prefix), path(filebam), path(annotation_file) from bam_map_to_mmquant
+	path filebam from bam_map_to_mmquant.flatten().collect()
+	path annotation_file from annotation_to_mmquant 
 
 	output:
 	path "*.tsv" into quantification_to_report
 
 	script:
 	"""
-	mmquant -a $annotation_file -r $filebam -o ${prefix}.tsv
+	mmquant -a $annotation_file -r $filebam  -o report.tsv
 	"""
 
 }  
