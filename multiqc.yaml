@@ -4,11 +4,35 @@ skip_generalstats: True
 
 run_modules:
   - fastqc
+  - cutadapt
+  - custom_content
 
 module_order:
   - fastqc:
-      name: 'Raw reads quality'
+      name: 'Raw goods reads quality'
       target: 'FastQC'
       info: 'results for each input fastq file.'
       path_filters_exclude:
-        - "~/Documents/projet_nextflow/results/fastqc/* fastqc.zip"
+        - "~/Documents/projet_nextflow/results/fastqc_good_reads/* fastqc.zip"
+  - cutadapt:
+      name: 'Trimming'
+      target: 'Cutadapt'
+      info: 'results for each input fastq file.'
+  - custom_content
+
+custom_content:
+  order:
+    - mmquant
+
+custom_data:
+  mmquant:
+    parent_id: mmquant
+    parent_name: 'Annotation comparaison'
+    parent_description: 'Comparison between reference annotation and novel annotation.'
+    section_name: 'Transcript types'
+    description: 'Types of transcripts in the novel annotation relative to the reference annotation. Extended transcripts: at least one more intron on the extremities. Shortened transcripts: at least one less intron on the extremities.'
+    plot_type: 'bargraph'
+
+sp:
+   mmquant:
+     fn: 'quantification_to_report.tsv'

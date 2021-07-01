@@ -77,7 +77,8 @@ Channel.fromPath(annotation)
 */
 
 process control_quality_with_fastqc {
-
+	
+	publishDir "$baseDir/results/fastqc" , mode: 'copy'
 	
 	input :
 	tuple path(reads), val(prefix)  from reads_ch_to_fastqc
@@ -128,12 +129,29 @@ process cleaning_reads_with_low_complexity {
 
 	output:
 	tuple val(prefix), path("*good*.fastq") into read_clean_to_maps
-	tuple val(prefix), path("*good*.fastq") into lol
+	tuple val(prefix), path("*good*.fastq") into control_quality_of_goods_reads
 	script:
 	"""
 	prinseq-lite.pl -fastq $reads_trim -lc_method dust -lc_threshold 7
 	"""
 }
+
+process control_quality_good_reads_with_fastqc {
+	
+	publishDir "$baseDir/results/fastqc_good_reads" , mode: 'copy'
+
+        input :
+        tuple val(prefix), path(reads)  from control_quality_of_goods_reads
+
+        output:
+        path '*_fastqc.zip' into fastqc_good_reads_to_report
+
+        script:
+        """
+        fastqc $reads
+        """
+}
+
 
 if (!index){
 
@@ -219,7 +237,7 @@ process mmquant {
 
 	script:
 	"""
-	mmquant -a $annotation_file -r $filebam  -o report.tsv
+	mmquant -a $annotation_file -r $filebam  -o quantification_to_report.tsv
 	"""
 
 }  
@@ -236,6 +254,7 @@ process multiQC {
 	path '*' from fastqc_to_report.flatten().collect()
 	path '*' from trim_to_report.flatten().collect()
 	path '*' from quantification_to_report.flatten().collect()
+	path '*' from fastqc_good_reads_to_report.flatten().collect()
 
 
 	output:
