@@ -2,7 +2,7 @@
 
 ## Why are we doing this pipeline ?
 
-This pipeline use some programms which aren't use by any other pipeline which analyses Small Rnas. The existing pipelines analyses only microRNAs, a category of smallRNAs, and they don't consider in a satisfactory way the sequences aligning in a multiple way on the genome. These programms ([srnaMapper]( https://github.com/mzytnicki/srnaMapper) and [mmquant](https://bitbucket.org/mzytnicki/multi-mapping-counter/src/master/)) make that this pipeline is very useful for the reproductibily of the analyses of smallRnas. 
+This pipeline uses some programms which aren't use by any other pipeline which analyse smallRnas. The existing pipelines analyse only microRNAs, a category of smallRNAs, and they don't consider in a satisfactory way the sequences aligning in a multiple way on the genome. These programms ([srnaMapper]( https://github.com/mzytnicki/srnaMapper) and [mmquant](https://bitbucket.org/mzytnicki/multi-mapping-counter/src/master/)) make that this pipeline is very useful for the reproductibily of the analyses of smallRnas. 
 
 ## Arguments
 
