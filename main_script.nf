@@ -49,8 +49,8 @@ if (error) exit 1, error
 Channel
 	.fromPath(reads)
 	.map { path ->
-	filename= path.getName()
-	return [path,filename]
+	filename= path.getSimpleName()
+	return [filename,path]
 }
 	.into{ 
 	reads_ch_to_fastqc 
@@ -59,7 +59,7 @@ Channel
 
 Channel.fromPath(genome)
         .map { path ->
-        filename= path.getName()
+        filename= path.getSimpleName()
         return [filename,path]
 }
         .into{
@@ -81,7 +81,7 @@ process control_quality_with_fastqc {
 	publishDir "$baseDir/results/fastqc" , mode: 'copy'
 	
 	input :
-	tuple path(reads), val(prefix)  from reads_ch_to_fastqc
+	tuple val(prefix), path(reads)  from reads_ch_to_fastqc
 
 	output:
 	path '*_fastqc.zip' into fastqc_to_report
@@ -103,7 +103,7 @@ process trimming {
         publishDir "$baseDir/results/trimming" , mode: 'copy'
 
         input :
-        tuple path(reads), val(prefix)  from reads_ch_to_trimming
+        tuple val(prefix), path(reads) from reads_ch_to_trimming
 
         output :
 	path "*trimming_report.txt" into trim_to_report
@@ -218,7 +218,7 @@ process mapping_with_srnamapper {
         script:
         """
 	srnaMapper -r $reads -g $index -o ${prefix}.sam 
-	samtools view -b ${prefix}.sam > ${prefix}.bam
+	samtools sort ${prefix}.sam > ${prefix}.bam
 	"""
 
 }
