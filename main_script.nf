@@ -233,11 +233,25 @@ process mmquant {
 	path annotation_file from annotation_to_mmquant 
 
 	output:
-	path "*.tsv" into quantification_to_report
-
+	path "*report.tsv" into quantification_to_report
+	path "final_tab2.tsv" into quantification_table_to_report 
 	script:
 	"""
-	mmquant -a $annotation_file -r $filebam  -o quantification_to_report.tsv
+	mmquant -a $annotation_file -r $filebam  -o quantification_to_report.tsv -O tab.tsv
+	sed 's/                       /;/g' tab.tsv > tab1.tsv
+	sed 's/                     //g' tab1.tsv > tab2.tsv
+	sed 's/           //g' tab2.tsv > tab3.tsv
+	sed 's/:          /:/g' tab3.tsv > tab4.tsv
+	sed '2s/          /;/g' tab4.tsv > tab5.tsv
+	sed 's/          /;/g' tab5.tsv > tab6.tsv
+	sed 's/    //g' tab6.tsv > tab7.tsv
+        sed 's/:  /:/g' tab7.tsv > tab8.tsv
+        sed 's/(......)/;/g' tab8.tsv > tab9.tsv
+	sed 's/:  /:/g' tab9.tsv > tab10.tsv
+	sed 's/:/;/g' tab10.tsv > tab11.tsv
+	sed 's/#//g' tab11.tsv > tab12.tsv
+	sed 's/;/\t/g' tab12.tsv > final_tab.tsv
+	datamash transpose < final_tab.tsv > final_tab2.tsv
 	"""
 
 }  
@@ -255,8 +269,7 @@ process multiQC {
 	path '*' from trim_to_report.flatten().collect()
 	path '*' from quantification_to_report.flatten().collect()
 	path '*' from fastqc_good_reads_to_report.flatten().collect()
-
-
+	path '*' from quantification_table_to_report.flatten().collect()
 	output:
 	path 'multiqc_report.html' 
 

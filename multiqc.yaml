@@ -1,6 +1,6 @@
 show_analysis_paths: False
 show_analysis_time: False
-skip_generalstats: True
+skip_generalstats: False
 
 run_modules:
   - fastqc
@@ -9,15 +9,22 @@ run_modules:
 
 module_order:
   - fastqc:
-      name: 'Raw goods reads quality'
+      name: 'Raw reads quality'
       target: 'FastQC'
       info: 'results for each input fastq file.'
       path_filters_exclude:
-        - "~/Documents/projet_nextflow/results/fastqc_good_reads/* fastqc.zip"
+        - "~/Documents/projet_nextflow/results/fastqc/* fastqc.zip"
   - cutadapt:
       name: 'Trimming'
       target: 'Cutadapt'
       info: 'results for each input fastq file.'
+  - fastqc:
+      name: 'Trimmed reads quality'
+      target: 'FastQC'
+      info: 'results for each input fastq file.'
+      path_filters_exclude:
+        - "~/Documents/projet_nextflow/results/fastqc_good_reads/*fastqc.zip"
+
   - custom_content
 
 custom_content:
@@ -27,12 +34,26 @@ custom_content:
 custom_data:
   mmquant:
     parent_id: mmquant
-    parent_name: 'Annotation comparaison'
+    parent_name: 'Annotation comparaison' 
     parent_description: 'Comparison between reference annotation and novel annotation.'
     section_name: 'Transcript types'
-    description: 'Types of transcripts in the novel annotation relative to the reference annotation. Extended transcripts: at least one more intron on the extremities. Shortened transcripts: at least one less intron on the extremities.'
-    plot_type: 'bargraph'
+    description: 'Bjr' 
+    plot_type: 'generalstats'
 
 sp:
    mmquant:
-     fn: 'quantification_to_report.tsv'
+     fn: 'final_tab2.tsv'
+
+table_columns_visible:
+   Raw reads quality: False
+   Trimming : False
+   Trimmed reads quality: False 
+   mmquant: True
+
+table_columns_placement:
+   mmquant:
+      hits: 100
+      non-uniquely mapped hits: 200
+      ambiguous hits: 300000
+      unassigned hits: 400
+      uniquely mapped reads: 500
