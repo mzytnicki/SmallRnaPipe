@@ -1,3 +1,5 @@
+#!/bin/bash
+
 /
 * Parse and check parameters
 */
@@ -52,9 +54,8 @@ Channel
 	filename= path.getSimpleName()
 	return [filename,path]
 }
-	.into{ 
-	reads_ch_to_fastqc 
-	reads_ch_to_trimming
+	.set{ 
+	reads_ch_to_decompressed
 }
 
 Channel.fromPath(genome)
@@ -76,12 +77,32 @@ Channel.fromPath(annotation)
 * Process to control quality of reads with FASTQC
 */
 
+
+process decompress {
+
+        input : 
+        tuple val(prefix), path(reads) from reads_ch_to_decompressed
+
+        output:
+        path '*.fastq' into fastq_decompressed_to_control
+        tuple val(prefix), path("*fastq") into fastq_decompressed_to_trimming
+
+        script:
+	"""
+	if [[ "\$(tail -c 8 <<<$reads)"  == .tar.gz ]]; then
+        	tar -xf $reads -O > ${prefix}.fastq
+        elif [[ "\$(tail -c 4 <<<$reads)" == .gz ]]; then
+        	gzip -c -d $reads > ${prefix}.fastq
+        fi
+	"""
+}
+
 process control_quality_with_fastqc {
 	
 	publishDir "$baseDir/results/fastqc" , mode: 'copy'
 	
 	input :
-	tuple val(prefix), path(reads)  from reads_ch_to_fastqc
+	path reads from fastq_decompressed_to_control
 
 	output:
 	path '*_fastqc.zip' into fastqc_to_report
@@ -103,7 +124,7 @@ process trimming {
         publishDir "$baseDir/results/trimming" , mode: 'copy'
 
         input :
-        tuple val(prefix), path(reads) from reads_ch_to_trimming
+        tuple val(prefix), path(reads) from fastq_decompressed_to_trimming
 
         output :
 	path "*trimming_report.txt" into trim_to_report
@@ -212,7 +233,11 @@ process mapping_with_srnamapper {
 
 
         output:
-        path ("*.bam") into bam_map_to_mmquant
+        path ("*.bam") into bam_to_mmquant
+        tuple val (prefix), path ("*.bam") into bam_to_flagstats
+        tuple val (prefix), path ("*.bam") into bam_to_idxstats
+        tuple val (prefix), path ("*.bam") into bam_to_stats
+
 
 
         script:
@@ -223,21 +248,71 @@ process mapping_with_srnamapper {
 
 }
 
+process control_alignments {
+	
+	publishDir "$baseDir/results/flagstats",mode: "copy"
+
+	input :
+	tuple val(prefix), path (bam) from bam_to_flagstats
+
+	output :
+	path ('*.flagstat') into control_alignements_to_report
+
+	script:
+	"""
+	samtools flagstat $bam > ${prefix}.flagstat
+	"""
+}
+
+process control_metrics {
+
+        publishDir "$baseDir/results/stats",mode: "copy"
+
+	input :
+	tuple val(prefix), path(bam) from bam_to_stats
+
+	output :
+	path ('*.stats') into control_metrics_to_report
+
+	script:
+	"""
+	samtools stats $bam > ${prefix}.stats
+	"""
+}
+
+process control_contigs {
+
+        publishDir "$baseDir/results/idxstats",mode: "copy"
+
+	input :
+	tuple val(prefix), path(bam) from bam_to_idxstats
+
+	output :
+	path ('*.idxstats') into control_contigs_to_report
+
+	script:
+	"""
+	samtools index $bam
+	samtools idxstats $bam > ${prefix}.idxstats
+	"""
+}
+
+
 process mmquant {
 
 	publishDir "$baseDir/results/mmquant", mode: "copy"
 
 
 	input:
-	path filebam from bam_map_to_mmquant.flatten().collect()
+	path filebam from bam_to_mmquant.flatten().collect()
 	path annotation_file from annotation_to_mmquant 
 
 	output:
-	path "*report.tsv" into quantification_to_report
+	path "*report.summary" into quantification_to_report
 	path "final_tab2.tsv" into quantification_table_to_report 
 	script:
 	"""
-	mmquant -a $annotation_file -r $filebam  -o quantification_to_report.tsv -O tab.tsv
+	mmquant -a $annotation_file -r $filebam  -F -O tab.tsv > quantification_report.summary
 	sed 's/                       /;/g' tab.tsv > tab1.tsv
 	sed 's/                     //g' tab1.tsv > tab2.tsv
 	sed 's/           //g' tab2.tsv > tab3.tsv
@@ -270,6 +345,10 @@ process multiQC {
 	path '*' from quantification_to_report.flatten().collect()
 	path '*' from fastqc_good_reads_to_report.flatten().collect()
 	path '*' from quantification_table_to_report.flatten().collect()
+        path '*' from control_alignements_to_report.flatten().collect()
+        path '*' from control_metrics_to_report.flatten().collect()
+        path '*' from control_contigs_to_report.flatten().collect()
+
 	output:
 	path 'multiqc_report.html' 
 

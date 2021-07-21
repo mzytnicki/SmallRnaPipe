@@ -8,6 +8,7 @@ run_modules:
   - custom_content
 
 module_order:
+  - custom_content
   - fastqc:
       name: 'Raw reads quality'
       target: 'FastQC'
@@ -25,8 +26,6 @@ module_order:
       path_filters_exclude:
         - "~/Documents/projet_nextflow/results/fastqc_good_reads/*fastqc.zip"
 
-  - custom_content
-
 custom_content:
   order:
     - mmquant
@@ -39,7 +38,6 @@ custom_data:
     section_name: 'Transcript types'
     description: 'Bjr' 
     plot_type: 'generalstats'
-
 sp:
    mmquant:
      fn: 'final_tab2.tsv'
@@ -48,12 +46,21 @@ table_columns_visible:
    Raw reads quality: False
    Trimming : False
    Trimmed reads quality: False 
-   mmquant: True
+   tab_mmquant: True
 
 table_columns_placement:
-   mmquant:
+   tab_mmquant:
       hits: 100
       non-uniquely mapped hits: 200
       ambiguous hits: 300000
       unassigned hits: 400
       uniquely mapped reads: 500
+
+
+
+
+
+
+
+
+
