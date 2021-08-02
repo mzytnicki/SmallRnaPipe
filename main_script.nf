@@ -47,8 +47,7 @@ if (error) exit 1, error
 * Channel
 */
 
-Channel
-	.fromPath(reads)
+Channel.fromPath(reads)
 	.map { path ->
 	filename= path.getSimpleName()
 	return [filename,path]
@@ -234,8 +233,6 @@ process mapping_with_srnamapper {
         tuple val (prefix), path ("*.bam") into bam_to_flagstats
         tuple val (prefix), path ("*.bam") into bam_to_idxstats
         tuple val (prefix), path ("*.bam") into bam_to_stats
-	tuple val (prefix), path ("*.sam") into sam_to_convert_to_arf
-
 
         script:
         """
@@ -311,19 +308,7 @@ process mmquant {
 	script:
 	"""
 	mmquant -a $annotation_file -r $filebam  -F -O tab.tsv > quantification_report.summary
-	sed 's/                       /;/g' tab.tsv > tab1.tsv
-	sed 's/                     //g' tab1.tsv > tab2.tsv
-	sed 's/           //g' tab2.tsv > tab3.tsv
-	sed 's/:          /:/g' tab3.tsv > tab4.tsv
-	sed '2s/          /;/g' tab4.tsv > tab5.tsv
-	sed 's/          /;/g' tab5.tsv > tab6.tsv
-	sed 's/    //g' tab6.tsv > tab7.tsv
-        sed 's/:  /:/g' tab7.tsv > tab8.tsv
-        sed 's/(......)/;/g' tab8.tsv > tab9.tsv
-	sed 's/:  /:/g' tab9.tsv > tab10.tsv
-	sed 's/:/;/g' tab10.tsv > tab11.tsv
-	sed 's/#//g' tab11.tsv > tab12.tsv
-	sed 's/;/\t/g' tab12.tsv > final_tab.tsv
+	sed -e 's/                       /;/g' -e 's/                     //g' -e 's/           //g' -e 's/:          /:/g' -e '2s/          /;/g' -e 's/          /;/g' -e 's/    //g' -e 's/:  /:/g' -e 's/(......)/;/g' -e 's/:  /:/g' -e 's/:/;/g' -e 's/#//g' -e 's/;/\t/g'  tab.tsv > final_tab.tsv
 	datamash transpose < final_tab.tsv > final_tab2.tsv
 	"""
 
