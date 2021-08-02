@@ -10,7 +10,6 @@ genome = params.containsKey('genome') ? params.genome : ''
 annotation = params.containsKey('annotation') ? params.annotation : ''
 
 
-
 log.info """\
 
 
@@ -71,14 +70,12 @@ Channel.fromPath(genome)
 Channel.fromPath(annotation)
 	.set{ annotation_to_mmquant
 	}
-
-
 /*
 * Process to control quality of reads with FASTQC
 */
 
 
-process decompress {
+process decompress_reads {
 
         input : 
         tuple val(prefix), path(reads) from reads_ch_to_decompressed
@@ -237,7 +234,7 @@ process mapping_with_srnamapper {
         tuple val (prefix), path ("*.bam") into bam_to_flagstats
         tuple val (prefix), path ("*.bam") into bam_to_idxstats
         tuple val (prefix), path ("*.bam") into bam_to_stats
-
+	tuple val (prefix), path ("*.sam") into sam_to_convert_to_arf
 
 
         script:
@@ -247,6 +244,7 @@ process mapping_with_srnamapper {
 	"""
 
 }
+
 
 process control_alignments {
 	
