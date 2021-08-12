@@ -5,6 +5,8 @@ skip_generalstats: False
 run_modules:
   - fastqc
   - cutadapt
+  - samtools
+  - featureCounts
   - custom_content
 
 module_order:
@@ -19,13 +21,14 @@ module_order:
       name: 'Trimming'
       target: 'Cutadapt'
       info: 'results for each input fastq file.'
-  - fastqc:
-      name: 'Trimmed reads quality'
-      target: 'FastQC'
-      info: 'results for each input fastq file.'
-      path_filters_exclude:
-        - "~/Documents/projet_nextflow/results/fastqc_good_reads/*fastqc.zip"
-
+  - samtools:
+      name: 'Mapping quality'
+      target: 'Samtools flagstat, idxstats and stats'
+      info: 'results for each generated and input bam file.' 
+  - featureCounts:
+      name: 'Exonic reads'
+      target: 'FeatureCounts'
+      info: 'results for each quantified bam file.'
 custom_content:
   order:
     - mmquant
