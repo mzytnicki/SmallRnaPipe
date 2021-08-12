@@ -16,7 +16,4 @@ dependencies:
   - srnamapper=1.0.7
   - mmquant=1.0.4
   - mirdeep2=2.0.1.2
-<<<<<<< HEAD
   - bowtie=1.3.0
-=======
->>>>>>> 105a514d52419e1e0e9e110c0007d4588f872bd0
