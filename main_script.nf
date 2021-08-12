@@ -343,7 +343,7 @@ if (!index){
 
 
 		input:
-		tuple val(prefix), path(reads) from genome_to_index
+		tuple val(prefix), path(genome) from genome_to_index
 
 		output:
 		path '*.amb' 
