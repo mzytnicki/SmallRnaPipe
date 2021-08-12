@@ -91,8 +91,6 @@ Channel.from(o_species)
 	.set{ other_species_to_mature_extraction
 }
 
-=======
->>>>>>> 105a514d52419e1e0e9e110c0007d4588f872bd0
 /*
 * Process to decompress FASTQ file 
 */
@@ -453,11 +451,6 @@ process mapping_with_srnamapper {
         tuple val (prefix), path ("*.bam") into bam_to_flagstats
         tuple val (prefix), path ("*.bam") into bam_to_idxstats
         tuple val (prefix), path ("*.bam") into bam_to_stats
-<<<<<<< HEAD
-	tuple val (prefix), path ("*.sam") into sam_to_convert_to_arf
-
-=======
->>>>>>> 105a514d52419e1e0e9e110c0007d4588f872bd0
 
         script:
         """
@@ -467,12 +460,10 @@ process mapping_with_srnamapper {
 
 }
 
-<<<<<<< HEAD
 /*
 * Process to control the alignements with samtools flagstat
 */
-=======
->>>>>>> 105a514d52419e1e0e9e110c0007d4588f872bd0
+
 
 process control_alignments {
 	
