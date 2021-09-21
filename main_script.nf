@@ -73,7 +73,6 @@ Channel.fromPath(genome)
 Channel.fromPath(annotation)
 	.set{ annotation_to_mmquant
 	}
-<<<<<<< HEAD
 Channel.fromPath(mature)
 	.set{ mature_to_decompress
 	}
